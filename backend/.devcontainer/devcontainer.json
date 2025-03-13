@@ -1,8 +1,8 @@
 {
   "name": "BTG Investment API Dev Container",
   "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
+    "dockerfile": "../Dockerfile",
+    "context": "../."
   },
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
@@ -12,6 +12,9 @@
     "ms-python.python",
     "ms-azuretools.vscode-docker"
   ],
+  "remoteEnv": {
+    "MONGO_URI": "mongodb://localhost:27017"
+  },
   "postCreateCommand": "pip install -r requirements.txt",
   "forwardPorts": [8000]
 }
