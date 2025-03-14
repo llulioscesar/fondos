@@ -1,41 +1,116 @@
-name: Deploy Back-End to AWS
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CloudFormation template for deploying a FastAPI backend on Elastic Beanstalk (using EC2),
+  including the necessary IAM roles (instance profile and service role).
 
-on:
-  push:
-    branches:
-      - master
+Parameters:
+  ApplicationName:
+    Description: Name of the Elastic Beanstalk application.
+    Type: String
+    Default: FastAPIApp
+  EnvironmentName:
+    Description: Name of the Elastic Beanstalk environment.
+    Type: String
+    Default: FastAPIEnv
+  S3Bucket:
+    Description: S3 bucket where the FastAPI source bundle (ZIP file) is stored.
+    Type: String
+  S3Key:
+    Description: S3 key (path) for the FastAPI source bundle ZIP file.
+    Type: String
+  SolutionStackName:
+    Description: The solution stack (platform) to use.
+    Type: String
+    Default: "64bit Amazon Linux 2023 v4.4.1 running Python 3.9"
+  MONGOURI:
+    Description: MongoDB connection string.
+    Type: String
 
+Resources:
+  # IAM Role for EC2 instances in Elastic Beanstalk
+  EBEc2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-elasticbeanstalk-ec2-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  EBEc2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: aws-elasticbeanstalk-ec2-role
+      Roles:
+        - Ref: EBEc2Role
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+  # IAM Role for Elastic Beanstalk service
+  EBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-elasticbeanstalk-service-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - elasticbeanstalk.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkManagedUpdatesInstanceProfile
 
-      - name: Package FastAPI App
-        run: |
-          zip -r backend-app.zip backend/  # Ajusta la ruta según tu estructura
+  FastAPIApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Ref ApplicationName
+      Description: "FastAPI Application"
 
-      - name: Upload package to S3
-        run: |
-          aws s3 cp backend-app.zip s3://btg-fastapi-deploy/backend-app.zip --region us-east-2
+  FastAPIApplicationVersion:
+    Type: AWS::ElasticBeanstalk::ApplicationVersion
+    Properties:
+      ApplicationName: !Ref FastAPIApplication
+      Description: "Version of FastAPI Application"
+      SourceBundle:
+        S3Bucket: !Ref S3Bucket
+        S3Key: !Ref S3Key
 
-      - name: Deploy CloudFormation Stack for FastAPI
-        run: |
-          aws cloudformation deploy \
-            --template-file cloudformation/backend-cloudformation.yaml \
-            --stack-name FastAPIStack \
-            --capabilities CAPABILITY_IAM \
-            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=backend-app.zip" \
-            --region us-east-2
-      
+  FastAPIEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    DependsOn: FastAPIApplicationVersion
+    Properties:
+      ApplicationName: !Ref FastAPIApplication
+      EnvironmentName: !Ref EnvironmentName
+      SolutionStackName: !Ref SolutionStackName
+      OptionSettings:
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: ENVIRONMENT
+          Value: production
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: MONGO_URI
+          Value: !Ref MONGOURI
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref EBEc2InstanceProfile
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref EBServiceRole
 
-      
+Outputs:
+  EnvironmentURL:
+    Description: "URL of the Elastic Beanstalk environment."
+    Value: !GetAtt FastAPIEnvironment.EndpointURL
