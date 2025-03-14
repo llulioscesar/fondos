@@ -111,6 +111,9 @@ Resources:
           OptionName: MONGO_URI
           Value: !Ref MONGOURI
         - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: HOST
+          Value: 0.0.0.0
+        - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: PORT
           Value: 8080
         - Namespace: aws:autoscaling:launchconfiguration
