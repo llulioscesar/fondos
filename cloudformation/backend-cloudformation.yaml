@@ -110,6 +110,9 @@ Resources:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: MONGO_URI
           Value: !Ref MONGOURI
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: PORT
+          Value: 8080
         - Namespace: aws:autoscaling:launchconfiguration
           OptionName: IamInstanceProfile
           Value: !Ref EBEc2InstanceProfile
