@@ -27,8 +27,7 @@ Parameters:
     Type: String
 
 Resources:
-  # IAM Role for EC2 instances in Elastic Beanstalk
-  EB_EC2_Role:
+  EBEc2Role:
     Type: AWS::IAM::Role
     Properties:
       RoleName: aws-elasticbeanstalk-ec2-role
@@ -47,15 +46,14 @@ Resources:
         - arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker
         - arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier
 
-  EB_EC2_InstanceProfile:
+  EBEc2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: aws-elasticbeanstalk-ec2-role
       Roles:
-        - Ref: EB_EC2_Role
+        - Ref: EBEc2Role
 
-  # IAM Service Role for Elastic Beanstalk
-  EB_Service_Role:
+  EBServiceRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: aws-elasticbeanstalk-service-role
@@ -96,7 +94,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
-      # Omitimos VersionLabel para que EB use la última version creada
+      # Se omite VersionLabel para que EB use la última versión creada
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
@@ -106,10 +104,10 @@ Resources:
           Value: !Ref MONGOURI
         - Namespace: aws:autoscaling:launchconfiguration
           OptionName: IamInstanceProfile
-          Value: !Ref EB_EC2_InstanceProfile
+          Value: !Ref EBEc2InstanceProfile
         - Namespace: aws:elasticbeanstalk:environment
           OptionName: ServiceRole
-          Value: !Ref EB_Service_Role
+          Value: !Ref EBServiceRole
 
 Outputs:
   EnvironmentURL:
