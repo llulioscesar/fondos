@@ -47,7 +47,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
-      # Se omite VersionLabel para que use la última versión creada
+      # Se elimina VersionLabel para que EB use la versión más reciente disponible
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
