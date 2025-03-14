@@ -24,7 +24,7 @@ Parameters:
     Description: The application version label.
     Type: String
     Default: v1
-  MONGO_URI:
+  MONGOURI:
     Description: MongoDB connection string.
     Type: String
 
