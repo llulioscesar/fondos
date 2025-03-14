@@ -61,3 +61,22 @@ no tienen clara la tecnología deberán acercarse a su jefe inmediato.
 
 ## Parte 2 - 20 %
 
+Escriba las consultas SQL correspondientes, para ello, tenga en cuenta la base de datos llamada
+“BTG” la cual tiene las siguientes tablas (tenga en cuenta que se puede presentar el caso de que
+no todas las sucursales ofrecen los mismos productos).
+
+Obtener los nombres de los clientes los cuales tienen inscrito algún producto disponible sólo en
+las sucursales que visitan.
+
+```sql
+SELECT c.nombre
+FROM Cliente c
+JOIN Inscripción i ON c.id = i.idCliente
+JOIN Disponibilidad d ON i.idProducto = d.idProducto
+LEFT JOIN Visitan v ON v.idSucursal = d.idSucursal
+AND v.idCliente = c.id
+GROUP BY c.id,
+         c.nombre,
+         i.idProducto
+HAVING COUNT(d.idSucursal) = COUNT(v.idSucursal);
+```
