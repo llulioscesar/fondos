@@ -1,7 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  CloudFormation template for deploying a FastAPI backend on Elastic Beanstalk (using EC2),
-  including the necessary IAM roles (instance profile and service role).
+  CloudFormation template that creates all necessary resources for deploying a FastAPI
+  backend on Elastic Beanstalk using EC2 (Python platform). This template provisions:
+    - IAM roles and instance profile for EB EC2 instances
+    - IAM role for the EB service
+    - The EB Application, ApplicationVersion, and Environment
 
 Parameters:
   ApplicationName:
@@ -27,7 +30,7 @@ Parameters:
     Type: String
 
 Resources:
-  # IAM Role for EC2 instances in Elastic Beanstalk
+  # IAM Role for EC2 instances (for Elastic Beanstalk)
   EBEc2Role:
     Type: AWS::IAM::Role
     Properties:
@@ -43,9 +46,11 @@ Resources:
               - sts:AssumeRole
       Path: "/"
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
-        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier
 
+  # Instance Profile for EC2 instances
   EBEc2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -53,7 +58,7 @@ Resources:
       Roles:
         - Ref: EBEc2Role
 
-  # IAM Role for Elastic Beanstalk service
+  # IAM Role for the Elastic Beanstalk service
   EBServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -71,14 +76,15 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
         - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService
-        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkManagedUpdatesInstanceProfile
 
+  # Elastic Beanstalk Application
   FastAPIApplication:
     Type: AWS::ElasticBeanstalk::Application
     Properties:
       ApplicationName: !Ref ApplicationName
       Description: "FastAPI Application"
 
+  # Application version using the ZIP from S3
   FastAPIApplicationVersion:
     Type: AWS::ElasticBeanstalk::ApplicationVersion
     Properties:
@@ -88,6 +94,7 @@ Resources:
         S3Bucket: !Ref S3Bucket
         S3Key: !Ref S3Key
 
+  # Elastic Beanstalk Environment
   FastAPIEnvironment:
     Type: AWS::ElasticBeanstalk::Environment
     DependsOn: FastAPIApplicationVersion
@@ -95,6 +102,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
+      # No se especifica VersionLabel para que EB use la última versión registrada
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
