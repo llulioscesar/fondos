@@ -32,13 +32,14 @@ Resources:
   FastAPIApplication:
     Type: AWS::ElasticBeanstalk::Application
     Properties:
-      ApplicationName: !Ref ApplicationName
+      ApplicationName: "FastAPIApp"
       Description: "FastAPI Application"
 
   FastAPIApplicationVersion:
     Type: AWS::ElasticBeanstalk::ApplicationVersion
     Properties:
       ApplicationName: !Ref FastAPIApplication
+      ApplicationVersionName: !Ref VersionLabel
       Description: "Version of FastAPI Application"
       SourceBundle:
         S3Bucket: !Ref S3Bucket
