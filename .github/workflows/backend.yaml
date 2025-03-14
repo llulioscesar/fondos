@@ -5,7 +5,6 @@ on:
     branches:
       - master
 
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,12 +20,15 @@ jobs:
           aws-region: us-east-2
 
       - name: Package FastAPI App
+        id: package
         run: |
-          zip -r backend-app.zip backend/  # Ajusta la ruta según tu estructura
+          TIMESTAMP=$(date +%s)
+          zip -r backend-app-${TIMESTAMP}.zip backend/  # Ajusta la ruta según tu estructura
+          echo "::set-output name=zip_name::backend-app-${TIMESTAMP}.zip"
 
       - name: Upload package to S3
         run: |
-          aws s3 cp backend-app.zip s3://btg-fastapi-deploy/backend-app.zip --region us-east-2
+          aws s3 cp ${{ steps.package.outputs.zip_name }} s3://btg-fastapi-deploy/${{ steps.package.outputs.zip_name }} --region us-east-2
 
       - name: Deploy CloudFormation Stack for FastAPI
         run: |
@@ -34,8 +36,5 @@ jobs:
             --template-file cloudformation/backend-cloudformation.yaml \
             --stack-name FastAPIStack \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=backend-app.zip" \
+            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=${{ steps.package.outputs.zip_name }}" \
             --region us-east-2
-      
-
-      
