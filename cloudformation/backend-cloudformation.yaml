@@ -32,7 +32,7 @@ Resources:
   FastAPIApplication:
     Type: AWS::ElasticBeanstalk::Application
     Properties:
-      ApplicationName: "FastAPIApp"
+      ApplicationName: !Ref ApplicationName
       Description: "FastAPI Application"
 
   FastAPIApplicationVersion:
@@ -40,7 +40,7 @@ Resources:
     Properties:
       ApplicationName: !Ref FastAPIApplication
       Description: "Version of FastAPI Application"
-      VersionLabel: !Ref VersionLabel
+      # Eliminamos la propiedad VersionLabel
       SourceBundle:
         S3Bucket: !Ref S3Bucket
         S3Key: !Ref S3Key
@@ -52,7 +52,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
-      VersionLabel: !Ref VersionLabel
+      VersionLabel: !Ref VersionLabel  # Aquí se indica el label para el entorno
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
