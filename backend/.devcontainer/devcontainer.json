@@ -13,7 +13,7 @@
     "ms-azuretools.vscode-docker"
   ],
   "remoteEnv": {
-    "MONGO_URI": "mongodb://localhost:27017"
+    "MONGO_URI": "mongodb+srv://llulioscesar:qFY043Faj8HpMqGp@cluster-test.oey5m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-test"
   },
   "postCreateCommand": "pip install -r requirements.txt",
   "forwardPorts": [8000]
