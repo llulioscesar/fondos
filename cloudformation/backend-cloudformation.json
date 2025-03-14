@@ -67,9 +67,6 @@
         "EnvironmentName": {
           "Ref": "EnvironmentName"
         },
-        "VersionLabel": {
-          "Ref": "FastAPIApplicationVersion"
-        },
         "SolutionStackName": {
           "Ref": "SolutionStackName"
         },
