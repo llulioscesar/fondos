@@ -111,7 +111,7 @@ Resources:
           OptionName: MONGO_URI
           Value: !Ref MONGOURI
         - Namespace: aws:elasticbeanstalk:application:environment
-          OptionName: BIND
+          OptionName: WEB_BIND
           Value: 0.0.0.0:8080
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: HOST
