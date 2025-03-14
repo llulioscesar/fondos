@@ -46,6 +46,7 @@ Resources:
 
   FastAPIEnvironment:
     Type: AWS::ElasticBeanstalk::Environment
+    DependsOn: FastAPIApplicationVersion
     Properties:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
