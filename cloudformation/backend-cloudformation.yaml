@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  CloudFormation template for deploying FastAPI backend with Elastic Beanstalk using Docker.
-  This template deploys a Docker container version of your FastAPI app.
+  CloudFormation template for deploying a FastAPI backend on Elastic Beanstalk (using EC2),
+  including the necessary IAM roles (instance profile and service role).
 
 Parameters:
   ApplicationName:
@@ -13,31 +13,78 @@ Parameters:
     Type: String
     Default: FastAPIEnv
   S3Bucket:
-    Description: S3 bucket where the FastAPI Docker source bundle is stored.
+    Description: S3 bucket where the FastAPI source bundle (ZIP file) is stored.
     Type: String
   S3Key:
-    Description: S3 key (path) for the FastAPI Docker source bundle ZIP file.
+    Description: S3 key (path) for the FastAPI source bundle ZIP file.
     Type: String
   SolutionStackName:
-    Description: The solution stack to use.
+    Description: The solution stack (platform) to use.
     Type: String
-    Default: "64bit Amazon Linux 2023 v4.4.1 running Docker"
+    Default: "64bit Amazon Linux 2023 v4.4.1 running Python 3.9"
   MONGOURI:
     Description: MongoDB connection string.
     Type: String
 
 Resources:
+  # IAM Role for EC2 instances in Elastic Beanstalk
+  EBEc2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-elasticbeanstalk-ec2-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier
+
+  EBEc2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: aws-elasticbeanstalk-ec2-role
+      Roles:
+        - Ref: EBEc2Role
+
+  # IAM Role for Elastic Beanstalk service
+  EBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-elasticbeanstalk-service-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - elasticbeanstalk.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkManagedUpdatesInstanceProfile
+
   FastAPIApplication:
     Type: AWS::ElasticBeanstalk::Application
     Properties:
       ApplicationName: !Ref ApplicationName
-      Description: "FastAPI Application using Docker"
+      Description: "FastAPI Application"
 
   FastAPIApplicationVersion:
     Type: AWS::ElasticBeanstalk::ApplicationVersion
     Properties:
       ApplicationName: !Ref FastAPIApplication
-      Description: "Docker version of FastAPI Application"
+      Description: "Version of FastAPI Application"
       SourceBundle:
         S3Bucket: !Ref S3Bucket
         S3Key: !Ref S3Key
@@ -56,6 +103,12 @@ Resources:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: MONGO_URI
           Value: !Ref MONGOURI
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref EBEc2InstanceProfile
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref EBServiceRole
 
 Outputs:
   EnvironmentURL:
