@@ -15,9 +15,10 @@ type Transaction = {
 
 type Props = {
     transactions: Transaction[];
+    onCancel: (id: string) => void;
 };
 
-export const TransactionsTable: FC<Props> = ({ transactions }) => {
+export const TransactionsTable: FC<Props> = ({ transactions, onCancel }) => {
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow rounded">
@@ -41,7 +42,7 @@ export const TransactionsTable: FC<Props> = ({ transactions }) => {
                         <td className="py-3 px-4 text-sm text-gray-900">{tx.amount}</td>
                         <td className="py-3 px-4 text-sm text-gray-900">{tx.date}</td>
                         <td className="py-3 px-4 text-sm text-gray-900">{tx.email}</td>
-                        <td>{(!tx.cancel && tx.type === 'subscribe') && <Button>Cancelar</Button>}</td>
+                        <td>{(!tx.cancel && tx.type === 'subscribe') && <Button onClick={() => onCancel(tx.id)}>Cancelar</Button>}</td>
                     </tr>
                 ))}
                 </tbody>

@@ -4,24 +4,24 @@ import {FormField} from "@/components/molecules/FormField";
 import React, {ChangeEvent, FC, FormEvent, useState} from 'react';
 import {Button} from "@/components/atoms/Button";
 
-type Fields = {
+export type SubscriptionFields = {
     fund: string;
     amount: number;
-    email: string;
+    mail: string;
 }
 
 type Props = {
-    onSubmit: (values: Fields) => void;
+    onSubmit: (values: SubscriptionFields) => void;
     fundName: string;
 };
 
 export const SubscriptionForm: FC<Props> = ({ onSubmit, fundName }) => {
     const [amount, setAmount] = useState(0);
-    const [email, setEmail] = useState('');
+    const [mail, setEmail] = useState('');
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onSubmit({ fund: fundName, amount, email });
+        onSubmit({ fund: fundName, amount, mail });
         setAmount(0);
         setEmail('');
     };
@@ -44,11 +44,11 @@ export const SubscriptionForm: FC<Props> = ({ onSubmit, fundName }) => {
             <FormField
                 label="Email"
                 type="email"
-                value={email}
+                value={mail}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
             />
-            <Button type="submit" className="mt-4">
+            <Button type="submit" className="mt-4" disabled={amount <= 0 || mail === ''}>
                 Submit Subscription
             </Button>
         </form>

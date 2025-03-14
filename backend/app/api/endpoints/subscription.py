@@ -16,18 +16,12 @@ async def subscriptions():
 
 @router.post("/subscribe", response_model=Transaction)
 async def subscribe(request: SubscriptionRequest):
-    try:
-        subscription = await subscription_service.create_subscription(
-            request.fund, request.amount, request.mail
-        )
-        return subscription
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    subscription = await subscription_service.create_subscription(
+        request.fund, request.amount, request.mail
+    )
+    return subscription
 
 @router.post("/unsubscribe", response_model=Transaction)
 async def unsubscribe(request: UnsubscriptionRequest):
-    try:
-        subscription = await subscription_service.cancel_subscription(request.transaction_id)
-        return subscription
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    subscription = await subscription_service.cancel_subscription(request.transaction_id)
+    return subscription
