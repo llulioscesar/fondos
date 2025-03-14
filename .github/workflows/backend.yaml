@@ -23,6 +23,8 @@ jobs:
       - name: Deploy CloudFormation Stack for FastAPI
         run: |
           aws cloudformation deploy \
-          --template-file backend-cloudformation.yaml \
-          --stack-name FastAPIStack \
-          --capabilities CAPABILITY_IAM
+            --template-file cloudformation/backend-cloudformation.yaml \
+            --stack-name FastAPIStack \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides MONGO_URI=${{ secrets.MONGO_URI }} S3Bucket=your-bucket S3Key=backend-app.zip
+      
