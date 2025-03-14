@@ -20,10 +20,6 @@ Parameters:
     Description: The solution stack to use.
     Type: String
     Default: "64bit Amazon Linux 2023 v4.4.1 running Python 3.9"
-  VersionLabel:
-    Description: The application version label.
-    Type: String
-    Default: v1
   MONGOURI:
     Description: MongoDB connection string.
     Type: String
@@ -43,7 +39,6 @@ Resources:
       SourceBundle:
         S3Bucket: !Ref S3Bucket
         S3Key: !Ref S3Key
-      VersionLabel: !Ref VersionLabel  # Añadida esta propiedad para definir la etiqueta de versión
 
   FastAPIEnvironment:
     Type: AWS::ElasticBeanstalk::Environment
@@ -52,7 +47,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
-      VersionLabel: !Ref VersionLabel
+      # Se omite VersionLabel para que use la última versión creada
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
