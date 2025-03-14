@@ -26,6 +26,7 @@ jobs:
             --template-file cloudformation/backend-cloudformation.yaml \
             --stack-name FastAPIStack \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides MONGOURI=${{ secrets.MONGOURI }} S3Bucket=btg-fastapi-deploy S3Key=backend-app.zip
+            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=backend-app.zip"
+      
 
       
