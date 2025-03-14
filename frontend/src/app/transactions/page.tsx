@@ -5,7 +5,7 @@ import DashboardTemplate from "@/components/templates/DashboardTemplate";
 import {TransactionsTable} from "@/components/organisms/TransactionsTable";
 import {Modal} from "@/components/organisms/Modal";
 import {Button} from "@/components/atoms/Button";
-import {URL_SUBSCRIBE, URL_UNSUBSCRIBE} from "@/util/urls";
+import {URL_UNSUBSCRIBE} from "@/util/urls";
 
 export default function Home() {
 
