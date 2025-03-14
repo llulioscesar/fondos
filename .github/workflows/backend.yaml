@@ -20,13 +20,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
+      - name: Package FastAPI App
+        run: |
+          zip -r backend-app.zip backend/  # Ajusta la ruta según tu estructura
+
+      - name: Upload package to S3
+        run: |
+          aws s3 cp backend-app.zip s3://btg-fastapi-deploy/backend-app.zip --region us-east-2
+
       - name: Deploy CloudFormation Stack for FastAPI
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/backend-cloudformation.yaml \
             --stack-name FastAPIStack \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=backend-app.zip"
+            --parameter-overrides "MONGOURI=${{ secrets.MONGOURI }}" "S3Bucket=btg-fastapi-deploy" "S3Key=backend-app.zip" \
+            --region us-east-2
       
 
       
