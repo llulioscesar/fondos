@@ -57,7 +57,7 @@ Resources:
           Value: "production"
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: MONGO_URI
-          Value: !Ref MONGO_URI
+          Value: !Ref MONGOURI
 
 Outputs:
   EnvironmentURL:
