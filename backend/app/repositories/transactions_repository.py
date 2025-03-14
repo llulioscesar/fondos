@@ -36,3 +36,19 @@ class TransactionRepository:
             del doc["_id"]
             subscriptions.append(Transaction(**doc))
         return subscriptions
+
+    async def update_transaction(self, transaction_id: str, fund_data: dict) -> Transaction:
+        object_id = ObjectId(transaction_id)
+
+        if "_id" in fund_data:
+            del fund_data["_id"]
+        if "id" in fund_data:
+            del fund_data["id"]
+
+        result = await self.collection.update_one({ "_id": object_id }, { "$set": fund_data })
+        if result.modified_count == 0:
+            return None
+        doc = await self.collection.find_one({"_id": object_id})
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+        return Transaction(**doc)

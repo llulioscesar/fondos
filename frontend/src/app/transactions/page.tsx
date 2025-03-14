@@ -1,29 +1,29 @@
-"use client";
+'use client'
 
 import React, {useCallback, useEffect, useState} from 'react';
 import DashboardTemplate from "@/components/templates/DashboardTemplate";
-import {FundsTable} from "@/components/organisms/FundsTable";
+import {TransactionsTable} from "@/components/organisms/TransactionsTable";
 
 export default function Home() {
 
-    const [funds, setFunds] = useState([]);
+    const [transactions, setTransactions] = useState([]);
 
     const getData = useCallback(async () => {
-        const response = await fetch('http://localhost:8000/funds');
+        const response = await fetch('http://localhost:8000/subscription');
         const result = await response.json();
-        setFunds(result);
+        setTransactions(result);
     }, []);
 
     useEffect(() => {
-        if (funds.length === 0) {
+        if (transactions.length === 0) {
             getData();
         }
-    }, [funds.length, getData]);
+    }, [transactions.length, getData]);
 
     return (
         <>
             <DashboardTemplate>
-                <FundsTable funds={funds} onSubscribe={name => {console.log(name)}}/>
+                <TransactionsTable transactions={transactions} />
             </DashboardTemplate>
         </>
     );

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import subscription, funds
 from app.core.db import verify_db_connection
@@ -9,6 +10,14 @@ app = FastAPI(
     title="BTG Investment API",
     description="API for fund subscription and cancellation",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.on_event("startup")

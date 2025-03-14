@@ -52,14 +52,11 @@ class SubscriptionService:
             type="subscribe",
             amount=amount,
             date=datetime.now(),
-            email=email
+            email=email,
+            cancel=0,
         )
 
-        print('sidhhsj')
-
         transaction = await self.repository.create_transaction(transaction)
-
-        print('oooooooo')
 
         send_notification(fund_name, "subscribe", email)
 
@@ -85,10 +82,14 @@ class SubscriptionService:
             type="cancel",
             amount=original_tx.amount,
             date=datetime.now(),
-            email=original_tx.email
+            email=original_tx.email,
+            cancel=0,
         )
 
         transaction = await self.repository.create_transaction(cancel_tx)
+
+        original_tx.cancel = 1
+        await self.repository.update_transaction(original_tx.id, original_tx.dict())
 
         send_notification(original_tx.fund, "cancel", original_tx.email)
 

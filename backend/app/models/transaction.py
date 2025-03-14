@@ -8,3 +8,4 @@ class Transaction(BaseModel):
     amount: float
     date: datetime
     email: str
+    cancel: bool
