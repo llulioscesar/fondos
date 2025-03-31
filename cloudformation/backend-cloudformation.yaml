@@ -102,7 +102,7 @@ Resources:
       ApplicationName: !Ref FastAPIApplication
       EnvironmentName: !Ref EnvironmentName
       SolutionStackName: !Ref SolutionStackName
-      # No se especifica VersionLabel para que EB use la última versión registrada
+      VersionLabel: !Ref FastAPIApplicationVersion  # Añadir esto
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: ENVIRONMENT
@@ -125,6 +125,12 @@ Resources:
         - Namespace: aws:elasticbeanstalk:environment
           OptionName: ServiceRole
           Value: !Ref EBServiceRole
+        - Namespace: aws:elasticbeanstalk:environment:proxy
+          OptionName: ProxyServer
+          Value: nginx
+        - Namespace: aws:elasticbeanstalk:environment:proxy:staticfiles
+          OptionName: /static
+          Value: /static
 
 Outputs:
   EnvironmentURL:

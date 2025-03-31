@@ -23,7 +23,7 @@ jobs:
         id: package
         run: |
           TIMESTAMP=$(date +%s)
-          zip -r backend-app-${TIMESTAMP}.zip backend/  # Ajusta la ruta según tu estructura
+          zip -r backend-app-${TIMESTAMP}.zip backend/
           echo "::set-output name=zip_name::backend-app-${TIMESTAMP}.zip"
 
       - name: Upload package to S3
