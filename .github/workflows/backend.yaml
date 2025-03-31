@@ -25,6 +25,7 @@ jobs:
           TIMESTAMP=$(date +%s)
           cd backend
           zip -r backend-app-${TIMESTAMP}.zip .
+          cd ..
           echo "::set-output name=zip_name::backend-app-${TIMESTAMP}.zip"
 
       - name: Upload package to S3
