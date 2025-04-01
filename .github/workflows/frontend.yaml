@@ -22,6 +22,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
+      - name: Deploy CloudFormation Stack for Frontend
+        id: cfdeploy
+        run: |
+          aws cloudformation deploy \
+          --template-file cloudformation/frontend-cloudformation.yaml \
+          --stack-name FrontendStack \
+          --capabilities CAPABILITY_IAM \
+          --parameter-overrides "BucketName=${{ vars.FRONTEND_S3_BUCKET }}" "PriceClass=PriceClass_100" \
+          --region us-east-2
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -41,16 +51,6 @@ jobs:
         env:
           S3_BUCKET_NAME: ${{ vars.FRONTEND_S3_BUCKET }}
         working-directory: frontend
-
-      - name: Deploy CloudFormation Stack for Frontend
-        id: cfdeploy
-        run: |
-          aws cloudformation deploy \
-          --template-file cloudformation/frontend-cloudformation.yaml \
-          --stack-name FrontendStack \
-          --capabilities CAPABILITY_IAM \
-          --parameter-overrides "BucketName=${{ vars.FRONTEND_S3_BUCKET }}" "PriceClass=PriceClass_100" \
-          --region us-east-2
 
       - name: Get CloudFront Distribution ID
         id: get_cf
