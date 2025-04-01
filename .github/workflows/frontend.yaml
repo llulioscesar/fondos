@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-    #paths:
-    #  - 'frontend/**'
+    paths:
+      - 'frontend/**'
 
 jobs:
   deploy:
@@ -42,7 +42,7 @@ jobs:
           npm install
           npm run build
         env:
-          API_URL: ${{vars.API_URL}}
+          NEXT_PUBLIC_API_URL: ${{vars.API_URL}}
         working-directory: frontend
 
       - name: Deploy static site to S3

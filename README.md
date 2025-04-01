@@ -2,7 +2,7 @@
 
 ## Aplicacion
 
-el api se encuentra en [http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs](http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs) y el front en []()
+el api se encuentra en [http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs](http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs) y el front en [http://btg-frontend-deploy.s3-website.us-east-2.amazonaws.com/](http://btg-frontend-deploy.s3-website.us-east-2.amazonaws.com/)
 
 ## Parte 1 – Fondos - 80%
 
