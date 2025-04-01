@@ -1,0 +1,54 @@
+name: Deploy Front-End to S3
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    environment: producction
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+        env:
+          API_URL: ${{vars.API_URL}}
+        working-directory: frontend
+
+      - name: Deploy static site to S3
+        run: |
+          aws s3 sync out/ s3://$S3_BUCKET_NAME/ --delete --region us-east-2
+        env:
+          S3_BUCKET_NAME: ${{ vars.FRONTEND_S3_BUCKET }}
+        working-directory: frontend
+
+      - name: Deploy CloudFormation Stack for Frontend
+        id: cfdeploy
+        run: |
+          aws cloudformation deploy \
+          --template-file cloudformation/frontend-cloudformation.yaml \
+          --stack-name FrontendStack \
+          --capabilities CAPABILITY_IAM \
+          --parameter-overrides "BucketName=${{ vars.FRONTEND_S3_BUCKET }}" "PriceClass=PriceClass_100" \
+          --region us-east-2
+
+      - name: Get CloudFront Distribution ID
+        id: get_cf
+        run: |
+          CF_DISTRIBUTION_ID=$(aws cloudformation describe-stacks --stack-name FrontendStack --region us-east-2 --query "Stacks[0].Outputs[?OutputKey=='DistributionID'].OutputValue" --output text)
+          echo "::set-output name=cf_id::$CF_DISTRIBUTION_ID"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ steps.get_cf.outputs.cf_id }} --paths "/*" --region us-east-2

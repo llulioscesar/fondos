@@ -1,5 +1,9 @@
 # PRUEBA TÉCNICA PARA INGENIERO DE DESARROLLO
 
+## Aplicacion
+
+el api se encuentra en [http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs](http://fastapienv.eba-dmpduyg7.us-east-2.elasticbeanstalk.com/docs) y el front en []()
+
 ## Parte 1 – Fondos - 80%
 
 1. Indique con sus propias palabras, qué tecnologías utilizaría para garantizar la
