@@ -5,7 +5,7 @@ import DashboardTemplate from "@/components/templates/DashboardTemplate";
 import {TransactionsTable} from "@/components/organisms/TransactionsTable";
 import {Modal} from "@/components/organisms/Modal";
 import {Button} from "@/components/atoms/Button";
-import {URL_UNSUBSCRIBE} from "@/util/urls";
+import {URL_SUBSCRIPTIONS, URL_UNSUBSCRIBE} from "@/util/urls";
 
 export default function Home() {
 
@@ -14,7 +14,7 @@ export default function Home() {
     const [idCancel, setIdCancel] = useState('');
 
     const getData = useCallback(async () => {
-        const response = await fetch('http://localhost:8000/subscription');
+        const response = await fetch(URL_SUBSCRIPTIONS);
         const result = await response.json();
         setTransactions(result);
     }, []);
