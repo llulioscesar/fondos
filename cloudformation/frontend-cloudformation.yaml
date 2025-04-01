@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   CloudFormation template for deploying a CloudFront distribution for the Next.js frontend.
-  This template creates (o utiliza) an S3 bucket for static hosting and a CloudFront distribution.
+  This template assumes that the S3 bucket for static hosting already exists.
 
 Parameters:
   BucketName:
-    Description: "Name of the S3 bucket to host the static frontend (if it doesn't exist, it will be created)."
+    Description: "Name of the existing S3 bucket that hosts the static frontend"
     Type: String
   PriceClass:
     Description: "CloudFront Price Class (PriceClass_100, PriceClass_200, or PriceClass_All)"
@@ -13,22 +13,17 @@ Parameters:
     Default: PriceClass_100
 
 Resources:
-  FrontendBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref BucketName
-      AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
-
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
           - Id: FrontendS3Origin
-            DomainName: !GetAtt FrontendBucket.DomainName
-            S3OriginConfig: {}
+            DomainName: !Sub "${BucketName}.s3.amazonaws.com"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
